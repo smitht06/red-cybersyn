@@ -1,18 +1,29 @@
-# First, build the application in the `/app` directory.
+# First, build the application in the /app directory.
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
+
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
+
 WORKDIR /app
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev
-ADD . /app
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+
+# Copy dependency files first (for better layer caching)
+COPY uv.lock pyproject.toml ./
+
+# Install dependencies without BuildKit mounts
+RUN uv sync --frozen --no-install-project --no-dev
+
+# Copy the rest of the application
+COPY . .
+
+# Install the project itself
+RUN uv sync --frozen --no-dev
 
 # Then, use a final image without uv
 FROM python:3.12-slim-bookworm
+
+# Create a non-root user
+RUN addgroup --system --gid 1001 app && \
+    adduser --system --uid 1001 --gid 1001 app
 
 # Copy the application from the builder
 COPY --from=builder --chown=app:app /app /app
