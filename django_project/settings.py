@@ -17,15 +17,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-0peo@#x9jur3!h$ryje!$879xww8y1y66jx!%*#ymhg&jkozs2"
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-0peo@#x9jur3!h$ryje!$879xww8y1y66jx!%*#ymhg&jkozs2"
+)
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "red-cybersyn-stage.us.aldryn.io"]
-
+ALLOWED_HOSTS = [
+    "localhost",
+    "0.0.0.0",
+    "127.0.0.1",
+    os.environ.get("DOMAIN", ""),
+    os.environ.get("DIVIO_DOMAIN", ""),
+]
 
 # Application definition
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -44,6 +51,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",
+    "storages",  # Required for S3 storage
     # Local
     "accounts",
     "pages",
@@ -87,13 +95,6 @@ TEMPLATES = [
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
 if "DATABASE_URL" in os.environ:
     DATABASES = {"default": dj_database_url.config(conn_max_age=500)}
 else:
@@ -120,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
@@ -151,15 +151,85 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# https://whitenoise.readthedocs.io/en/latest/django.html
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# ===============================================
+# DIVIO OBJECT STORAGE CONFIGURATION (S3)
+# ===============================================
+
+# Check if we're using S3 storage (Divio Cloud)
+USE_S3 = os.environ.get("DEFAULT_STORAGE_ACCESS_KEY_ID") and os.environ.get(
+    "DEFAULT_STORAGE_SECRET_ACCESS_KEY"
+)
+
+if USE_S3:
+    # AWS S3 Configuration
+    AWS_ACCESS_KEY_ID = os.environ.get("DEFAULT_STORAGE_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("DEFAULT_STORAGE_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("DEFAULT_STORAGE_BUCKET")
+    AWS_S3_REGION_NAME = os.environ.get("DEFAULT_STORAGE_REGION", "us-east-1")
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get(
+        "DEFAULT_STORAGE_CUSTOM_DOMAIN", f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    )
+    AWS_S3_OBJECT_PARAMETERS = {
+        "CacheControl": "max-age=86400",
+    }
+    AWS_S3_FILE_OVERWRITE = False
+
+    # S3 URLs
+    if AWS_S3_CUSTOM_DOMAIN:
+        AWS_S3_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}"
+    else:
+        AWS_S3_URL = (
+            f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+        )
+
+    # Storage backends using S3
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": AWS_ACCESS_KEY_ID,
+                "secret_key": AWS_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "region_name": AWS_S3_REGION_NAME,
+                "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+                "object_parameters": AWS_S3_OBJECT_PARAMETERS,
+                "file_overwrite": AWS_S3_FILE_OVERWRITE,
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": AWS_ACCESS_KEY_ID,
+                "secret_key": AWS_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "region_name": AWS_S3_REGION_NAME,
+                "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+                "object_parameters": AWS_S3_OBJECT_PARAMETERS,
+                "file_overwrite": AWS_S3_FILE_OVERWRITE,
+                "location": "static",  # Store static files in a 'static' folder
+            },
+        },
+    }
+
+    # Media files URL
+    MEDIA_URL = f"{AWS_S3_URL}/media/"
+    STATIC_URL = f"{AWS_S3_URL}/static/"
+
+else:
+    # Local storage (development or fallback)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    MEDIA_URL = "/media/"
+    STATIC_URL = "/static/"
+
+# Media files directory (local fallback)
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/stable/ref/settings/#default-auto-field
@@ -207,6 +277,8 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#csrf-trusted-origins
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",  # Default Django dev server
-    "http://127.0.0.1:8000",  # Alternative local address
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://*.divio-media.org",
+    "https://*.us.aldryn.io",
 ]
