@@ -39,4 +39,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
 # Use gunicorn on port 8000
-CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "django_project.wsgi:application"]
+CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "django_project.wsgi"]

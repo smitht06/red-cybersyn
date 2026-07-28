@@ -1,5 +1,4 @@
 from pathlib import Path
-import os
 import dj_database_url
 
 # django-debug-toolbar
@@ -94,12 +93,19 @@ TEMPLATES = [
 #     }
 # }
 
+import os
+
 DATABASES = {
-    "default": dj_database_url.config(
-        default=DEFAULT_DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    "default": {
+        "ENGINE": os.environ.get(
+            "DEFAULT_DATABASE_BACKEND", "django.db.backends.postgresql"
+        ),
+        "NAME": os.environ.get("DEFAULT_DATABASE_DATABASE_NAME", "postgres"),
+        "USER": os.environ.get("DEFAULT_DATABASE_USERNAME", "postgres"),
+        "PASSWORD": os.environ.get("DEFAULT_DATABASE_PASSWORD", "postgres"),
+        "HOST": os.environ.get("DEFAULT_DATABASE_HOSTNAME", "localhost"),
+        "PORT": os.environ.get("DEFAULT_DATABASE_PORT", 5432),
+    }
 }
 
 # Password validation
