@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # Local
     "accounts",
     "pages",
+    "shadowrun_char",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware

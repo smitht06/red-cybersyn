@@ -1,0 +1,100 @@
+{% extends "shadowrun_char/base_generator.html" %}
+{% block title %}Add Skills - {{ character.name }}{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="generator-card">
+                <h4 class="mb-4"><i class="bi bi-book"></i> Add Skills</h4>
+                <div class="row">
+                    <!-- Skill Selection -->
+                    <div class="col-md-5">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Add Skill</h6>
+                            </div>
+                            <div class="card-body">
+                                <form hx-post="{% url 'shadowrun_char:add_skill' character.pk %}"
+                                      hx-target="#skill-list"
+                                      hx-swap="innerHTML">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label">Skill</label>
+                                        <select name="skill_id" class="form-select" required>
+                                            <option value="">Choose a skill...</option>
+                                            {% for skill in skills %}
+                                                <option value="{{ skill.pk }}" data-category="{{ skill.category }}">
+                                                    {{ skill.name }} ({{ skill.category|title }})
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Rating (1-6)</label>
+                                        <input type="number"
+                                               name="rating"
+                                               class="form-control"
+                                               min="1"
+                                               max="6"
+                                               value="1"
+                                               required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Specialization (optional)</label>
+                                        <input type="text"
+                                               name="specialization"
+                                               class="form-control"
+                                               placeholder="e.g., Assault Rifles">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-plus-circle"></i> Add Skill
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Knowledge Skills -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Knowledge Skills</h6>
+                            </div>
+                            <div class="card-body">
+                                <select class="form-select mb-3">
+                                    <option value="">Choose knowledge skill...</option>
+                                    {% for skill in knowledge_skills %}
+                                        <option value="{{ skill.pk }}">{{ skill.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-plus-circle"></i> Add Knowledge Skill
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Current Skills -->
+                    <div class="col-md-7">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Current Skills</h6>
+                                <span class="badge bg-primary" id="skill-count">{{ character_skills|length }}</span>
+                            </div>
+                            <div class="card-body" id="skill-list">{% include "shadowrun_char/partials/skill_list.html" %}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'shadowrun_char:character_attributes' character.pk %}"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Attributes
+                            </a>
+                            <a href="{% url 'shadowrun_char:character_qualities' character.pk %}"
+                               class="btn btn-primary">
+                                <i class="bi bi-arrow-right"></i> Next: Qualities
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% if character_qualities %}
+    <div class="list-group">
+        {% for char_quality in character_qualities %}
+            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ char_quality.quality.name }}</strong>
+                    <span class="badge {% if char_quality.quality.type == 'positive' %}bg-success{% else %}bg-danger{% endif %} ms-2">
+                        {{ char_quality.quality.karmic_cost }} karma
+                    </span>
+                    <br>
+                    <small class="text-muted">{{ char_quality.quality.type|title }}</small>
+                </div>
+                <button class="btn btn-outline-danger btn-sm"
+                        hx-delete="{% url 'shadowrun_char:remove_quality' character.pk char_quality.pk %}"
+                        hx-target="#quality-list"
+                        hx-confirm="Remove this quality?">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-4">
+        <i class="bi bi-emoji-frown display-6 text-muted"></i>
+        <p class="text-muted mt-2">No qualities selected yet.</p>
+    </div>
+{% endif %}

@@ -1,0 +1,182 @@
+{% extends "shadowrun_char/base_generator.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Set Attributes - {{ character.name }}{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="generator-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4><i class="bi bi-graph-up"></i> Set Attributes</h4>
+                    <button class="btn btn-outline-primary"
+                            hx-post="{% url 'shadowrun_char:random_attributes' character.pk %}"
+                            hx-target="#attribute-form"
+                            hx-swap="innerHTML">
+                        <i class="bi bi-shuffle"></i> Randomize
+                    </button>
+                </div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>{{ character.metatype|title }}</strong> - Distribute attribute points wisely!
+                </div>
+                <form method="post" id="attribute-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <!-- Core Attributes -->
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">Core Attributes</h5>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Body (BOD)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_body', -1)">-</button>
+                                    {{ form.body }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_body', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Physical toughness and damage resistance</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Agility (AGI)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_agility', -1)">-</button>
+                                    {{ form.agility }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_agility', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Physical coordination and balance</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Reaction (REA)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_reaction', -1)">-</button>
+                                    {{ form.reaction }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_reaction', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Reflexes and response time</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Strength (STR)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_strength', -1)">-</button>
+                                    {{ form.strength }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_strength', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Physical power and lifting capacity</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Willpower (WIL)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_willpower', -1)">-</button>
+                                    {{ form.willpower }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_willpower', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Mental fortitude and determination</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">Mental & Special Attributes</h5>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Logic (LOG)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_logic', -1)">-</button>
+                                    {{ form.logic }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_logic', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Reasoning and problem-solving</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Intuition (INT)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_intuition', -1)">-</button>
+                                    {{ form.intuition }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_intuition', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Instinct and perception</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Charisma (CHA)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_charisma', -1)">-</button>
+                                    {{ form.charisma }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_charisma', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Force of personality and charm</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Edge (EDG)</label>
+                                <div class="d-flex align-items-center">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_edge', -1)">-</button>
+                                    {{ form.edge }}
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            onclick="adjustAttribute('id_edge', 1)">+</button>
+                                </div>
+                                <small class="text-muted">Luck and special moments</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Essence</label>
+                                {{ form.essence }}
+                                <small class="text-muted">Soul integrity (reduced by cyberware)</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-arrow-right"></i> Next: Skills
+                                </button>
+                                <a href="{% url 'shadowrun_char:home' %}"
+                                   class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+function adjustAttribute(elementId, delta) {
+    const input = document.getElementById(elementId);
+    let value = parseInt(input.value) || 0;
+    const min = parseInt(input.min) || 1;
+    const max = parseInt(input.max) || 6;
+    
+    value = Math.max(min, Math.min(max, value + delta));
+    input.value = value;
+}
+    </script>
+{% endblock %}

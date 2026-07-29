@@ -1,0 +1,86 @@
+{% extends "shadowrun_char/base_generator.html" %}
+{% block title %}My Characters{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="generator-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4><i class="bi bi-person-lines-fill"></i> My Characters</h4>
+                    <a href="{% url 'shadowrun_char:create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> New Character
+                    </a>
+                </div>
+                {% if characters %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Metatype</th>
+                                    <th>Type</th>
+                                    <th>Attributes</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for character in characters %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ character.name }}</strong>
+                                            {% if character.alias %}
+                                                <br>
+                                                <small class="text-muted">"{{ character.alias }}"</small>
+                                            {% endif %}
+                                        </td>
+                                        <td><span class="badge bg-primary">{{ character.metatype|title }}</span></td>
+                                        <td><span class="badge bg-secondary">{{ character.magic_type|title }}</span></td>
+                                        <td>
+                                            <small>
+                                                B:{{ character.body }} A:{{ character.agility }} R:{{ character.reaction }}
+                                                S:{{ character.strength }} W:{{ character.willpower }}
+                                                L:{{ character.logic }} I:{{ character.intuition }} C:{{ character.charisma }}
+                                            </small>
+                                        </td>
+                                        <td><small class="text-muted">{{ character.created_at|date:"M d, Y" }}</small></td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'shadowrun_char:character_sheet' character.pk %}"
+                                                   class="btn btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{% url 'shadowrun_char:pdf' character.pk %}"
+                                                   class="btn btn-outline-danger">
+                                                    <i class="bi bi-file-pdf"></i>
+                                                </a>
+                                                <form method="post"
+                                                      action="{% url 'shadowrun_char:delete_character' character.pk %}"
+                                                      style="display: inline"
+                                                      onsubmit="return confirm('Delete this character?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-emoji-frown display-4 text-muted"></i>
+                        <h4 class="mt-3 text-muted">No characters yet!</h4>
+                        <p>Create your first Shadowrun character to get started.</p>
+                        <a href="{% url 'shadowrun_char:create' %}"
+                           class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle"></i> Create Character
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

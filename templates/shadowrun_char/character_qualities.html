@@ -1,0 +1,100 @@
+{% extends "shadowrun_char/base_generator.html" %}
+{% block title %}Add Qualities - {{ character.name }}{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="generator-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4><i class="bi bi-star"></i> Add Qualities</h4>
+                    <div class="text-end">
+                        <small class="text-muted">Starting Karma: 25</small>
+                        <h5 class="mb-0">Available: <span id="karma-total">{{ total_karma }}</span> karma</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- Quality Selection -->
+                    <div class="col-md-5">
+                        <!-- Positive Qualities -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">Positive Qualities</h6>
+                            </div>
+                            <div class="card-body">
+                                <form hx-post="{% url 'shadowrun_char:add_quality' character.pk %}"
+                                      hx-target="#quality-list"
+                                      hx-swap="innerHTML">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quality_id" id="positive-quality-id">
+                                    <select class="form-select mb-3" id="positive-quality-select">
+                                        <option value="">Choose positive quality...</option>
+                                        {% for quality in positive_qualities %}
+                                            <option value="{{ quality.pk }}" data-cost="{{ quality.karmic_cost }}">
+                                                {{ quality.name }} ({{ quality.karmic_cost }} karma)
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit"
+                                            class="btn btn-success w-100"
+                                            onclick="document.getElementById('positive-quality-id').value = document.getElementById('positive-quality-select').value">
+                                        <i class="bi bi-plus-circle"></i> Add Positive Quality
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Negative Qualities -->
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0">Negative Qualities</h6>
+                            </div>
+                            <div class="card-body">
+                                <form hx-post="{% url 'shadowrun_char:add_quality' character.pk %}"
+                                      hx-target="#quality-list"
+                                      hx-swap="innerHTML">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quality_id" id="negative-quality-id">
+                                    <select class="form-select mb-3" id="negative-quality-select">
+                                        <option value="">Choose negative quality...</option>
+                                        {% for quality in negative_qualities %}
+                                            <option value="{{ quality.pk }}" data-cost="{{ quality.karmic_cost }}">
+                                                {{ quality.name }} (+{{ quality.karmic_cost }} karma)
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit"
+                                            class="btn btn-danger w-100"
+                                            onclick="document.getElementById('negative-quality-id').value = document.getElementById('negative-quality-select').value">
+                                        <i class="bi bi-plus-circle"></i> Add Negative Quality
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Current Qualities -->
+                    <div class="col-md-7">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Selected Qualities</h6>
+                                <span class="badge bg-primary" id="quality-count">{{ character_qualities|length }}</span>
+                            </div>
+                            <div class="card-body" id="quality-list">{% include "shadowrun_char/partials/quality_list.html" %}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'shadowrun_char:character_skills' character.pk %}"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Skills
+                            </a>
+                            <a href="{% url 'shadowrun_char:character_equipment' character.pk %}"
+                               class="btn btn-primary">
+                                <i class="bi bi-arrow-right"></i> Next: Equipment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

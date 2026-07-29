@@ -1,0 +1,61 @@
+{% load crispy_forms_tags %}
+<form method="post" id="attribute-form">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            <h5 class="text-muted mb-3">Core Attributes</h5>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Body (BOD)</label>
+                <div class="d-flex align-items-center">{{ form.body }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Agility (AGI)</label>
+                <div class="d-flex align-items-center">{{ form.agility }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Reaction (REA)</label>
+                <div class="d-flex align-items-center">{{ form.reaction }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Strength (STR)</label>
+                <div class="d-flex align-items-center">{{ form.strength }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Willpower (WIL)</label>
+                <div class="d-flex align-items-center">{{ form.willpower }}</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h5 class="text-muted mb-3">Mental & Special</h5>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Logic (LOG)</label>
+                <div class="d-flex align-items-center">{{ form.logic }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Intuition (INT)</label>
+                <div class="d-flex align-items-center">{{ form.intuition }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Charisma (CHA)</label>
+                <div class="d-flex align-items-center">{{ form.charisma }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Edge (EDG)</label>
+                <div class="d-flex align-items-center">{{ form.edge }}</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Essence</label>
+                {{ form.essence }}
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-right"></i> Next: Skills
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
