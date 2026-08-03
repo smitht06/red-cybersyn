@@ -1,0 +1,212 @@
+{% extends '_base.html' %}
+
+{% block title %}{{ character.name }}{% endblock title %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1>{{ character.name }}</h1>
+    {% if character.alias %}
+    <h5 class="text-muted">"{{ character.alias }}"</h5>
+    {% endif %}
+    <p class="text-muted mb-0">
+      {{ character.get_metatype_name_display }} &middot; {{ character.get_magic_type_display }}
+    </p>
+  </div>
+  <div>
+    <a href="{% url 'characters:update' character.pk %}" class="btn btn-outline-secondary">Edit</a>
+    <a href="{% url 'characters:delete' character.pk %}" class="btn btn-outline-danger">Delete</a>
+    <a href="{% url 'characters:list' %}" class="btn btn-outline-primary">Back</a>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Attributes -->
+  <div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-header"><strong>Attributes</strong></div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tbody>
+            {% for label, value in character.attribute_dict.items %}
+            <tr>
+              <td>{{ label }}</td>
+              <td class="text-end"><strong>{{ value }}</strong></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resources -->
+  <div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-header"><strong>Resources</strong></div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tbody>
+            <tr><td>Karma</td><td class="text-end"><strong>{{ character.karma }}</strong></td></tr>
+            <tr><td>Nuyen</td><td class="text-end"><strong>{{ character.nuyen }}</strong></td></tr>
+            <tr><td>Magic</td><td class="text-end"><strong>{{ character.magic }}</strong></td></tr>
+            <tr><td>Resonance</td><td class="text-end"><strong>{{ character.resonance }}</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background -->
+  <div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-header"><strong>Background</strong></div>
+      <div class="card-body">
+        {% if character.background %}
+        <p class="mb-0">{{ character.background|linebreaksbr }}</p>
+        {% else %}
+        <p class="text-muted mb-0">No background provided.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Skills -->
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Skills</strong>
+        <a href="{% url 'characters:skill_add' character.pk %}" class="btn btn-sm btn-primary">Add Skill</a>
+      </div>
+      <div class="card-body">
+        {% if skills %}
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th>Skill</th>
+              <th>Rating</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cs in skills %}
+            <tr>
+              <td>
+                {{ cs.skill.name }}
+                {% if cs.is_specialization %}<span class="badge bg-info">Spec</span>{% endif %}
+              </td>
+              <td>{{ cs.rating }}</td>
+              <td class="text-end">
+                <a href="{% url 'characters:skill_delete' cs.pk %}" class="btn btn-sm btn-outline-danger">Remove</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted mb-0">No skills added yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Qualities -->
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Qualities</strong>
+        <a href="{% url 'characters:quality_add' character.pk %}" class="btn btn-sm btn-primary">Add Quality</a>
+      </div>
+      <div class="card-body">
+        {% if qualities %}
+        <ul class="list-group list-group-flush">
+          {% for cq in qualities %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              {{ cq.quality.name }}
+              <span class="badge {% if cq.quality.quality_type == 'positive' %}bg-success{% else %}bg-danger{% endif %}">
+                {{ cq.quality.get_quality_type_display }}
+              </span>
+            </span>
+            <a href="{% url 'characters:quality_delete' cq.pk %}" class="btn btn-sm btn-outline-danger">Remove</a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted mb-0">No qualities added yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Gear -->
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Gear</strong>
+        <a href="{% url 'characters:gear_add' character.pk %}" class="btn btn-sm btn-primary">Add Gear</a>
+      </div>
+      <div class="card-body">
+        {% if gear %}
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cg in gear %}
+            <tr>
+              <td>{{ cg.gear.name }}</td>
+              <td>{{ cg.quantity }}</td>
+              <td class="text-end">
+                <a href="{% url 'characters:gear_delete' cg.pk %}" class="btn btn-sm btn-outline-danger">Remove</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted mb-0">No gear added yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Spells -->
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header"><strong>Spells</strong></div>
+      <div class="card-body">
+        {% if spells %}
+        <ul class="list-group list-group-flush">
+          {% for spell in spells %}
+          <li class="list-group-item">
+            {{ spell.name }}
+            <span class="badge bg-secondary">{{ spell.get_spell_type_display }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted mb-0">No spells known.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if character.notes %}
+<div class="card mb-4">
+  <div class="card-header"><strong>Notes</strong></div>
+  <div class="card-body">
+    <p class="mb-0">{{ character.notes|linebreaksbr }}</p>
+  </div>
+</div>
+{% endif %}
+{% endblock content %}

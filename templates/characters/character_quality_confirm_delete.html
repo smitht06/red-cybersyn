@@ -1,0 +1,23 @@
+{% extends '_base.html' %}
+
+{% block title %}Remove Quality{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-danger">
+      <div class="card-header bg-danger text-white"><strong>Remove Quality</strong></div>
+      <div class="card-body">
+        <p>Are you sure you want to remove <strong>{{ characterquality.quality.name }}</strong> from <strong>{{ character.name }}</strong>?</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Remove</button>
+            <a href="{% url 'characters:detail' character.pk %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
